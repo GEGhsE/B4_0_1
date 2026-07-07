@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>우리 반 앱 보물상자</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=Nunito:wght@700;800;900&display=swap">
+
+  <style>
+    :root {
+      --sky-1: #fff9f4;
+      --sky-2: #fff3f8;
+      --line: #f3dfe8;
+      --line-strong: #eccad8;
+      --text-1: #60496b;
+      --text-2: #8f7899;
+      --text-3: #bea5b8;
+      --white: #ffffff;
+
+      --blue-1: #ffb367;
+      --blue-2: #ff8fa8;
+      --blue-3: #fff3dd;
+      --mint-1: #74d9b6;
+      --mint-2: #d8f8e7;
+      --pink-1: #ff82b2;
+      --pink-2: #ffe0ee;
+      --yellow-1: #ffd45d;
+      --yellow-2: #fff0b5;
+      --purple-1: #c8a0ff;
+      --purple-2: #efe1ff;
+      --green-1: #95d86d;
+      --green-2: #ecf8d8;
+      --orange-1: #ffab73;
+      --orange-2: #ffe1c8;
+
+      --shadow-soft: 0 12px 24px rgba(226, 160, 188, .14);
+      --shadow-card: 0 18px 34px rgba(227, 167, 196, .18);
+      --shadow-hero: 0 22px 44px rgba(236, 171, 126, .22);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 18px;
+      --ease: cubic-bezier(.2, .8, .2, 1);
+      --bounce: cubic-bezier(.34, 1.56, .64, 1);
+
+      --f-display: 'Jua', sans-serif;
+      --f-body: 'Gowun Dodum', sans-serif;
+      --f-round: 'Nunito', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--f-body);
+      color: var(--text-1);
+      background:
+        radial-gradient(620px 340px at 0% 0%, rgba(255, 211, 159, .34), transparent 58%),
+        radial-gradient(720px 420px at 100% 12%, rgba(255, 194, 220, .38), transparent 55%),
+        radial-gradient(520px 260px at 50% 100%, rgba(255, 238, 177, .26), transparent 58%),
+        linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 100%);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
+
+    .bg-decor,
+    .bg-decor::before,
+    .bg-decor::after { pointer-events: none; }
+    .bg-decor {
+      position: fixed; inset: 0; z-index: 0; overflow: hidden;
+    }
+    .cloud {
+      position: absolute; background: rgba(255,255,255,.9); border-radius: 999px;
+      box-shadow: 0 12px 24px rgba(233, 175, 188, .12);
+      animation: floatCloud 14s ease-in-out infinite;
+    }
+    .cloud::before, .cloud::after {
+      content: ''; position: absolute; border-radius: 50%; background: inherit;
+    }
+    .cloud.c1 { width: 170px; height: 58px; top: 86px; left: 7%; }
+    .cloud.c1::before { width: 60px; height: 60px; left: 20px; top: -24px; }
+    .cloud.c1::after  { width: 74px; height: 74px; right: 22px; top: -28px; }
+    .cloud.c2 { width: 140px; height: 48px; top: 170px; right: 10%; animation-delay: -4s; }
+    .cloud.c2::before { width: 52px; height: 52px; left: 18px; top: -22px; }
+    .cloud.c2::after  { width: 64px; height: 64px; right: 16px; top: -28px; }
+    .cloud.c3 { width: 120px; height: 40px; bottom: 90px; left: 12%; opacity: .75; animation-delay: -7s; }
+    .cloud.c3::before { width: 44px; height: 44px; left: 16px; top: -18px; }
+    .cloud.c3::after  { width: 56px; height: 56px; right: 12px; top: -20px; }
+    .star, .coin {
+      position: absolute; animation: twinkle 4s ease-in-out infinite;
+    }
+    .star { color: #ffb85f; text-shadow: 0 0 10px rgba(255, 184, 95, .35); }
+    .coin { color: #ff8fb0; opacity: .28; }
+    .deco-icon { position: absolute; animation: floatCloud 11s ease-in-out infinite; filter: drop-shadow(0 5px 8px rgba(235, 166, 178, .16)); }
+    @keyframes floatCloud {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    @keyframes twinkle {
+      0%,100% { opacity: .4; transform: scale(1); }
+      50% { opacity: .95; transform: scale(1.18); }
+    }
+
+    .layout {
+      position: relative; z-index: 1;
+      display: grid;
+      grid-template-columns: 270px minmax(0, 1fr);
+      grid-template-rows: auto 1fr;
+      grid-template-areas: "header header" "side main";
+      min-height: 100vh;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    
+.header {
+      grid-area: header;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #ffe8bc 0%, #ffd7e7 45%, #fff1cd 100%);
+      border: 1px solid rgba(255,255,255,.82);
+      border-radius: 34px;
+      box-shadow: var(--shadow-hero);
+      min-height: 258px;
+      padding: 18px 24px 24px;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 14% 22%, rgba(255,255,255,.34), transparent 10%),
+        radial-gradient(circle at 82% 68%, rgba(255,255,255,.36), transparent 12%),
+        radial-gradient(circle at 72% 18%, rgba(255,255,255,.26), transparent 9%),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.10) 0 14px, transparent 14px 42px);
+      opacity: .9;
+      pointer-events: none;
+    }
+    .header::after {
+      content: '';
+      position: absolute; left: 28px; right: 28px; bottom: 14px;
+      height: 10px; border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255,170,122,.38), rgba(255,131,178,.34), rgba(255,212,93,.36));
+      opacity: .7;
+    }
+
+    .header-top {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+    .traffic { display: flex; gap: 8px; }
+    .traffic i {
+      display: block; width: 11px; height: 11px; border-radius: 999px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.08);
+    }
+    .traffic i:nth-child(1) { background: #ff8ea8; }
+    .traffic i:nth-child(2) { background: #ffd769; }
+    .traffic i:nth-child(3) { background: #79d77d; }
+
+    .header-status {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--f-round);
+      font-weight: 800;
+      color: #8d6680;
+      font-size: 13px;
+    }
+    .status-chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.64);
+      border: 1px solid rgba(255,255,255,.78);
+      box-shadow: 0 8px 16px rgba(230, 170, 152, .12);
+      backdrop-filter: blur(8px);
+    }
+    .status-chip .dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #7ddc88;
+      box-shadow: 0 0 0 4px rgba(125,220,136,.14);
+    }
+    .version-pill {
+      padding: 9px 12px; border-radius: 16px;
+      background: rgba(255,255,255,.76);
+      border: 1px solid rgba(255,255,255,.86);
+      color: #ff7aa9;
+      box-shadow: 0 8px 16px rgba(230,170,152,.10);
+    }
+
+    .header-inner {
+      position: relative; z-index: 2;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 188px;
+      padding: 6px 0 0;
+    }
+    .hero-brand {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 22px;
+      width: 100%;
+    }
+    .hero-chest {
+      width: 176px; height: 134px;
+      display: flex; align-items: center; justify-content: center;
+      filter: drop-shadow(0 12px 18px rgba(232, 164, 120, .2));
+    }
+    .hero-chest svg { width: 100%; height: auto; }
+    .hero-center {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-width: 0;
+    }
+    .logo-title {
+      display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px;
+      font-family: var(--f-display);
+      line-height: 1;
+      letter-spacing: -.03em;
+      text-align: center;
+      filter: drop-shadow(0 8px 14px rgba(235, 173, 128, .16));
+    }
+    .logo-title span {
+      display: inline-block;
+      font-size: clamp(40px, 4.5vw, 70px);
+      padding: 2px 5px;
+      -webkit-text-stroke: 3px rgba(255,255,255,.92);
+      text-shadow:
+        0 3px 0 rgba(255,255,255,.75),
+        0 8px 16px rgba(235, 173, 128, .10);
+    }
+    .logo-title .word-blue { color: #ff8e7c; }
+    .logo-title .word-blue2 { color: #ffb64c; }
+    .logo-title .word-pink { color: #ff74ae; }
+    .logo-title .word-yellow { color: #8fce63; }
+
+    .hero-ribbon {
+      margin-top: 12px;
+      min-width: min(620px, 95%);
+      max-width: 100%;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(255, 251, 240, .98), rgba(255, 246, 227, .96));
+      border: 1px solid rgba(255, 209, 132, .72);
+      border-radius: 22px;
+      padding: 14px 28px;
+      color: #8e6e33;
+      font-family: var(--f-display);
+      font-size: clamp(28px, 2.5vw, 42px);
+      line-height: 1.2;
+      box-shadow: 0 12px 18px rgba(235, 188, 116, .16);
+      position: relative;
+    }
+    .hero-ribbon::before,
+    .hero-ribbon::after {
+      content: '';
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      border-top: 14px solid transparent;
+      border-bottom: 14px solid transparent;
+    }
+    .hero-ribbon::before { left: -14px; border-right: 14px solid rgba(255, 251, 240, .95); }
+    .hero-ribbon::after  { right: -14px; border-left: 14px solid rgba(255, 251, 240, .95); }
+
+    .class-meta {
+      margin-top: 14px;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      color: #8f6782;
+      width: min(700px, 96%);
+    }
+    .class-pill {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 100%;
+      min-height: 54px;
+      padding: 12px 22px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.88);
+      border: 1px solid rgba(255,255,255,.96);
+      color: #b35f84;
+      font-family: var(--f-display);
+      font-size: clamp(18px, 1.7vw, 26px);
+      line-height: 1.3;
+      letter-spacing: -.02em;
+      box-shadow: 0 10px 16px rgba(230,170,152,.14);
+      text-align: center;
+    }
+
+    .header-side-visual {
+      width: 140px; height: 114px;
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .happy-cloud {
+      width: 122px; height: 50px;
+      border-radius: 999px; background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,247,251,.98));
+      position: absolute; right: 8px; top: 18px;
+      box-shadow: 0 10px 18px rgba(233,175,188,.14);
+    }
+    .happy-cloud::before, .happy-cloud::after {
+      content: ''; position: absolute; background: inherit; border-radius: 50%;
+    }
+    .happy-cloud::before { width: 46px; height: 46px; left: 12px; top: -16px; }
+    .happy-cloud::after  { width: 56px; height: 56px; right: 10px; top: -22px; }
+    .cloud-face {
+      position: absolute; right: 32px; top: 43px;
+      font-size: 22px; filter: saturate(1.1);
+    }
+    .small-spark { position: absolute; font-size: 18px; color: #ff9ebc; }
+    .small-spark.s1 { right: 6px; top: 76px; }
+    .small-spark.s2 { right: 96px; top: 8px; color: #ffc44e; }
+    .small-spark.s3 { right: 124px; top: 56px; color: #8ed169; }
+.sidebar {
+      grid-area: side;
+      min-width: 0;
+    }
+    .sidebar-panel {
+      background: linear-gradient(180deg, rgba(255,253,247,.96), rgba(255,247,251,.96));
+      border: 1px solid rgba(255,255,255,.94);
+      border-radius: 32px;
+      box-shadow: 0 18px 30px rgba(232, 177, 190, .13);
+      backdrop-filter: blur(14px);
+      padding: 22px 18px;
+      height: 100%;
+      min-height: 520px;
+      position: relative;
+      overflow: hidden;
+    }
+    .sidebar-panel::before {
+      content: '';
+      position: absolute; inset: 12px;
+      border-radius: 26px;
+      border: 2px dashed rgba(255, 194, 163, .44);
+      pointer-events: none;
+    }
+    .sidebar-panel::after {
+      content: '🎀';
+      position: absolute; right: 18px; bottom: 18px;
+      width: 56px; height: 56px; display: grid; place-items: center;
+      font-size: 30px; border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255,232,240,.96), rgba(255,245,206,.96));
+      box-shadow: 0 10px 20px rgba(239, 183, 144, .18);
+      opacity: .95;
+    }
+    .sidebar-title {
+      position: relative; z-index: 1;
+      display: inline-flex; align-items: center; gap: 10px;
+      color: #b27b39;
+      background: #fff3c7;
+      border: 1px solid rgba(255, 214, 112, .55);
+      border-radius: 999px;
+      padding: 9px 15px;
+      font-family: var(--f-display);
+      font-size: 16px; font-weight: 400; letter-spacing: -.02em;
+      margin-bottom: 18px;
+      box-shadow: 0 8px 14px rgba(255, 208, 113, .14);
+    }
+    .sidebar-title::before { content: '🗺️'; font-size: 18px; }
+    .nav {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .nav-item {
+      width: 100%;
+      display: flex; align-items: center; gap: 12px;
+      padding: 15px 16px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, #ffffff, #fffafc);
+      border: 1px solid rgba(244, 219, 228, .94);
+      box-shadow: 0 12px 18px rgba(232,177,190,.08);
+      text-align: left;
+      transition: transform .22s var(--ease), box-shadow .22s var(--ease), background .22s var(--ease);
+      position: relative; overflow: hidden;
+    }
+    .nav-item::after {
+      content: '✦'; position: absolute; right: 12px; top: 8px; font-size: 12px; color: rgba(255, 174, 89, .72);
+    }
+    .nav-item:hover {
+      transform: translateY(-2px) rotate(-.4deg);
+      box-shadow: 0 16px 24px rgba(232,177,190,.14);
+    }
+    .nav-item.is-active {
+      background: linear-gradient(135deg, #ffe8f1, #fff3bc 52%, #f5ffdb 100%);
+      color: #845b72;
+      border-color: rgba(255,255,255,.96);
+      box-shadow: 0 16px 24px rgba(255, 202, 121, .20);
+    }
+    .nav-item.bursting {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 20px 30px rgba(255, 188, 92, .26);
+    }
+    .nav-item.bursting::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 28px;
+      border: 3px solid rgba(255, 196, 87, .55);
+      animation: tabBurstRing .65s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes tabBurstRing {
+      0% { opacity: .95; transform: scale(.88); }
+      100% { opacity: 0; transform: scale(1.08); }
+    }
+    .nav-emoji { width: 28px; text-align: center; font-size: 24px; flex-shrink: 0; }
+    .nav-label {
+      flex: 1; min-width: 0;
+      font-family: var(--f-display);
+      font-size: 18px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .nav-count {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 36px; height: 30px; padding: 0 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.94);
+      box-shadow: inset 0 0 0 1px rgba(247, 196, 214, .30);
+      color: #b77e8d;
+      font-family: var(--f-round);
+      font-weight: 900;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+    .nav-item.is-active .nav-count { color: #ff74a6; }
+
+    .sidebar-helper {
+      position: relative; z-index: 1;
+      margin-top: 18px;
+      border-radius: 24px;
+      background: linear-gradient(180deg, #fff1f6, #fffdfa);
+      border: 1px solid rgba(244, 213, 223, .9);
+      padding: 18px 54px 18px 16px;
+      color: #b36b88;
+      font-family: var(--f-display);
+      font-size: 22px;
+      line-height: 1.42;
+      box-shadow: 0 12px 18px rgba(232,177,190,.08);
+      word-break: keep-all;
+    }
+    .sidebar-helper::before { content: '🍬'; position: absolute; right: 16px; top: 16px; font-size: 20px; }
+    .sidebar-helper span {
+      display: block; margin-top: 10px; font-family: var(--f-body); font-size: 15px; line-height: 1.5; color: #a38495; font-weight: 700;
+    }
+    .nav-select {
+      display: none;
+      width: 100%;
+      margin-top: 6px;
+      padding: 14px 44px 14px 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(244,213,223,.94);
+      background: var(--white) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23bf7f97' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 14px center / 18px;
+      color: var(--text-1);
+      font-family: var(--f-display);
+      font-size: 17px;
+      appearance: none;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .main {
+      grid-area: main;
+      min-width: 0;
+    }
+    .main-panel {
+      background: linear-gradient(180deg, rgba(255,252,247,.96), rgba(255,248,252,.97));
+      border: 1px solid rgba(255,255,255,.96);
+      border-radius: 32px;
+      box-shadow: 0 20px 34px rgba(232,177,190,.14);
+      backdrop-filter: blur(16px);
+      min-height: calc(100vh - 272px);
+      padding: 28px 30px 36px;
+      position: relative;
+      overflow: hidden;
+    }
+    .main-panel::before {
+      content: '';
+      position: absolute; inset: 12px;
+      border-radius: 24px;
+      border: 2px dashed rgba(245, 213, 178, .44);
+      pointer-events: none;
+    }
+    .main-content { position: relative; z-index: 1; }
+    .main-header { margin-bottom: 24px; }
+    .main-kicker {
+      display: inline-flex; align-items: center; gap: 10px;
+      color: #b27b39;
+      background: #fff3c7;
+      border: 1px solid rgba(255, 214, 112, .55);
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-family: var(--f-display);
+      font-size: 16px; font-weight: 400; letter-spacing: -.02em;
+      margin-bottom: 12px;
+      box-shadow: 0 8px 14px rgba(255, 208, 113, .14);
+    }
+    .main-kicker::before { content: '🎁'; font-size: 18px; }
+    .main-title {
+      display: inline-flex; align-items: center; gap: 12px;
+      font-family: var(--f-display);
+      font-size: clamp(34px, 3.4vw, 52px);
+      color: #7a5877;
+      letter-spacing: -.03em;
+      line-height: 1.05;
+    }
+    .main-title::after { content: '💖'; font-size: .5em; }
+    .main-sub {
+      margin-top: 8px;
+      color: #a28792;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 22px;
+      padding-top: 8px;
+    }
+    .card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      min-height: 316px;
+      border-radius: 30px;
+      padding: 22px 22px 18px;
+      border: 2px solid transparent;
+      background: rgba(255,255,255,.96);
+      box-shadow: 0 18px 28px rgba(232,177,190,.14);
+      overflow: hidden;
+      transition: transform .25s var(--bounce), box-shadow .25s var(--ease), border-color .25s var(--ease);
+    }
+    .card:hover {
+      transform: translateY(-6px) rotate(-.5deg);
+      box-shadow: 0 22px 36px rgba(232,177,190,.22);
+    }
+    .card::before {
+      content: '';
+      position: absolute; inset: 10px;
+      border-radius: 24px;
+      border: 2px dashed rgba(255,255,255,.96);
+      pointer-events: none;
+    }
+    .card::after {
+      content: '♡';
+      position: absolute; right: 18px; top: 90px; font-size: 18px; opacity: .5;
+    }
+    .card.style-sun {
+      background: linear-gradient(180deg, #fff6cb 0%, #fffdf2 100%);
+      border-color: rgba(255, 205, 97, .54);
+    }
+    .card.style-mint {
+      background: linear-gradient(180deg, #ffe6f0 0%, #fff9fc 100%);
+      border-color: rgba(255, 145, 187, .42);
+    }
+    .card.style-purple {
+      background: linear-gradient(180deg, #f2e8ff 0%, #fcf8ff 100%);
+      border-color: rgba(194, 149, 255, .42);
+    }
+    .card.style-pink {
+      background: linear-gradient(180deg, #e8fff3 0%, #fafffd 100%);
+      border-color: rgba(113, 216, 176, .42);
+    }
+
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+    .card-emoji-box {
+      width: 86px; height: 86px; flex-shrink: 0;
+      display: grid; place-items: center;
+      border-radius: 28px;
+      box-shadow: 0 12px 20px rgba(232,177,190,.16);
+      border: 1px solid rgba(255,255,255,.82);
+      transition: transform .28s var(--bounce);
+      position: relative;
+    }
+    .card-emoji-box::before {
+      content: ''; position: absolute; inset: 8px; border-radius: 21px; border: 2px dashed rgba(255,255,255,.58);
+    }
+    .card:hover .card-emoji-box { transform: translateY(-3px) rotate(-4deg); }
+    .style-sun .card-emoji-box   { background: linear-gradient(135deg, #ffd458, #ffb76a); }
+    .style-mint .card-emoji-box  { background: linear-gradient(135deg, #ff90ba, #ffb977); }
+    .style-purple .card-emoji-box{ background: linear-gradient(135deg, #d0a6ff, #b99bff); }
+    .style-pink .card-emoji-box  { background: linear-gradient(135deg, #7be0b9, #90d37d); }
+    .card-emoji { font-size: 40px; filter: drop-shadow(0 4px 8px rgba(0,0,0,.1)); }
+
+    .card-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 8px 12px; min-height: 34px;
+      border-radius: 999px;
+      color: #ffffff;
+      font-family: var(--f-round);
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: .02em;
+      box-shadow: 0 10px 18px rgba(232,177,190,.14);
+    }
+    .style-sun .card-badge    { background: linear-gradient(135deg, #ff9d8a, #ff7cad); }
+    .style-mint .card-badge   { background: linear-gradient(135deg, #ffb65e, #ff8f7e); }
+    .style-purple .card-badge { background: linear-gradient(135deg, #9ad66a, #6fc76b); }
+    .style-pink .card-badge   { background: linear-gradient(135deg, #ff8bbb, #ffa44d); }
+
+    .card-name {
+      font-family: var(--f-display);
+      font-size: 30px;
+      color: #7a5877;
+      line-height: 1.16;
+      letter-spacing: -.03em;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 0 rgba(255,255,255,.6);
+    }
+    .card-guide {
+      font-size: 17px;
+      color: #977c8d;
+      line-height: 1.66;
+      white-space: pre-line;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      margin-bottom: 18px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 84px;
+      background: rgba(255,255,255,.56);
+      border-radius: 18px;
+      padding: 12px 14px;
+    }
+    .card-guide span { line-height: inherit; }
+
+    .card-doodle { position: absolute; right: 28px; top: 124px; font-size: 18px; opacity: .72; }
+    .style-sun .card-doodle { color: #ffbf50; }
+    .style-mint .card-doodle { color: #ff83ac; }
+    .style-purple .card-doodle { color: #b388ff; }
+    .style-pink .card-doodle { color: #73cf9c; }
+
+    .card-cta {
+      position: relative; z-index: 1;
+      margin-top: auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 16px;
+      border-top: 1px dashed rgba(255,255,255,.85);
+    }
+    .cta-label { font-family: var(--f-display); font-size: 22px; letter-spacing: -.01em; }
+    .style-sun .cta-label { color: #e8a319; }
+    .style-mint .cta-label { color: #ff6d97; }
+    .style-purple .cta-label { color: #9b79ff; }
+    .style-pink .cta-label { color: #5dc18d; }
+    .cta-arrow {
+      width: 52px; height: 52px;
+      display: grid; place-items: center;
+      border-radius: 18px; color: #ffffff;
+      box-shadow: 0 10px 18px rgba(232,177,190,.18);
+      font-size: 24px; font-weight: 900;
+    }
+    .style-sun .cta-arrow { background: linear-gradient(135deg, #ffd04e, #ffb169); }
+    .style-mint .cta-arrow { background: linear-gradient(135deg, #ff91ba, #ffb26f); }
+    .style-purple .cta-arrow { background: linear-gradient(135deg, #c198ff, #ab95ff); }
+    .style-pink .cta-arrow { background: linear-gradient(135deg, #79dcb7, #97d96f); }
+
+.state {
+      display: grid; place-items: center;
+      min-height: 360px; text-align: center; padding: 30px 16px;
+    }
+    .state-box {
+      max-width: 560px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(244, 219, 228, .92);
+      box-shadow: var(--shadow-soft);
+      border-radius: 28px;
+      padding: 30px 26px;
+    }
+    .state-emoji {
+      font-size: 64px; margin-bottom: 14px;
+      animation: bounceState 2.8s ease-in-out infinite;
+    }
+    @keyframes bounceState {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .state-title {
+      font-family: var(--f-display);
+      font-size: 30px;
+      color: #7a5877;
+      margin-bottom: 10px;
+    }
+    .state-text {
+      font-size: 17px; line-height: 1.7; color: var(--text-2);
+    }
+    .spinner {
+      font-size: 56px; display: inline-block; margin-bottom: 14px;
+      animation: spinSoft 2.6s linear infinite;
+    }
+    @keyframes spinSoft { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+
+    .mascot {
+      position: fixed;
+      right: 24px; bottom: 24px;
+      width: 78px; height: 78px;
+      display: grid; place-items: center;
+      border-radius: 50%;
+      background: rgba(255,255,255,.98);
+      border: 1px solid rgba(255,233,241,.95);
+      box-shadow: 0 18px 30px rgba(232,177,190,.24);
+      z-index: 50;
+      user-select: none;
+      font-size: 36px;
+      transition: transform .35s var(--bounce);
+      animation: mascotFloat 4s ease-in-out infinite;
+    }
+    .mascot:hover { transform: scale(1.12) rotate(-10deg); }
+    .mascot:active { transform: scale(1.04) rotate(-4deg); }
+    @keyframes mascotFloat {
+      0%,100% { transform: translateY(0) rotate(-3deg); }
+      50% { transform: translateY(-6px) rotate(3deg); }
+    }
+
+    .treasure-particle {
+      position: absolute;
+      pointer-events: none;
+      animation: treasureBurst var(--dur, 1s) cubic-bezier(0.5, -0.5, 0.7, 1.4) forwards;
+      z-index: 100;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .2));
+    }
+    @keyframes treasureBurst {
+      0%   { transform: translate(0, 0) scale(.4) rotate(0); opacity: 1; }
+      100% { transform: translate(var(--dx, 0), var(--dy, -90px)) scale(1.3) rotate(var(--rot, 360deg)); opacity: 0; }
+    }
+    .treasure-toast {
+      position: fixed;
+      top: 22%; left: 50%; transform: translate(-50%, -14px);
+      background: linear-gradient(135deg, #ffe785, #ffc44d);
+      color: #61450a;
+      border: 2px solid #ffcc57;
+      border-radius: 18px;
+      padding: 14px 28px;
+      box-shadow: 0 18px 28px rgba(255, 196, 77, .28);
+      font-family: var(--f-display);
+      font-size: 24px;
+      z-index: 200;
+      pointer-events: none;
+      animation: toastPop 1.5s var(--bounce) forwards;
+    }
+    @keyframes toastPop {
+      0% { opacity: 0; transform: translate(-50%, -14px) scale(.7); }
+      18% { opacity: 1; transform: translate(-50%, 0) scale(1.06); }
+      36% { transform: translate(-50%, 0) scale(1); }
+      80% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -8px) scale(.96); }
+    }
+
+    @media (max-width: 1040px) {
+      .layout {
+        grid-template-columns: 1fr;
+        grid-template-areas: "header" "side" "main";
+      }
+      .header-inner { min-height: auto; }
+      .hero-brand { grid-template-columns: 1fr; justify-items: center; }
+      .header-side-visual { width: 100%; height: 72px; }
+      .hero-chest { width: 146px; height: 112px; }
+      .sidebar-panel { min-height: auto; padding-bottom: 18px; }
+      .nav { display: none; }
+      .nav-select { display: block; }
+      .main-panel { min-height: 420px; }
+    }
+    @media (max-width: 720px) {
+      .layout { gap: 12px; padding: 12px; }
+      .header { padding: 16px 16px 20px; min-height: 220px; border-radius: 24px; }
+      .header-top { margin-bottom: 8px; }
+      .hero-brand { gap: 12px; }
+      .hero-chest { width: 118px; height: 88px; }
+      .logo-title { gap: 6px; }
+      .logo-title span { font-size: 34px; -webkit-text-stroke: 2px #fff; }
+      .hero-ribbon { min-width: auto; width: 100%; font-size: 24px; padding: 12px 16px; }
+      .hero-ribbon::before, .hero-ribbon::after { display: none; }
+      .class-meta { width: 100%; }
+      .class-pill { font-size: 17px; padding: 10px 14px; min-height: 46px; }
+      .header-side-visual { height: 60px; }
+      .happy-cloud { width: 88px; height: 36px; top: 10px; right: 14px; }
+      .cloud-face { right: 33px; top: 30px; font-size: 18px; }
+      .sidebar-panel, .main-panel { border-radius: 24px; }
+      .main-panel { padding: 22px 18px 28px; }
+      .main-title { font-size: 34px; }
+      .main-sub { font-size: 16px; }
+      .grid { grid-template-columns: 1fr; gap: 16px; }
+      .card { min-height: 286px; padding: 18px 18px 16px; }
+      .card-name { font-size: 26px; }
+      .card-guide { font-size: 16px; min-height: auto; }
+      .mascot { width: 64px; height: 64px; font-size: 30px; right: 16px; bottom: 16px; }
+      .treasure-toast { font-size: 18px; padding: 12px 20px; }
+    }
+
+    .nav-item:focus-visible, .card:focus-visible, .mascot:focus-visible {
+      outline: 3px solid #7bafff;
+      outline-offset: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-decor" aria-hidden="true">
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="cloud c3"></div>
+    <div class="star" style="top:92px; left:32%; font-size:18px; animation-delay:-1s;">⭐</div>
+    <div class="star" style="top:210px; right:27%; font-size:16px; animation-delay:-2.4s;">✨</div>
+    <div class="star" style="bottom:140px; right:18%; font-size:18px; animation-delay:-1.2s;">⭐</div>
+    <div class="coin" style="top:280px; left:10%; font-size:30px; animation-delay:-3s;">💗</div>
+    <div class="coin" style="bottom:80px; right:12%; font-size:26px; animation-delay:-5s;">🍬</div>
+    <div class="deco-icon" style="top:132px; right:14%; font-size:22px; animation-delay:-2s;">🌼</div>
+    <div class="deco-icon" style="bottom:110px; left:19%; font-size:24px; animation-delay:-4s;">🎀</div>
+    <div class="deco-icon" style="top:320px; right:7%; font-size:20px; animation-delay:-3.2s;">🧸</div>
+  </div>
+
+  <div class="layout">
+    <header class="header">
+      <div class="header-top">
+        <div class="traffic"><i></i><i></i><i></i></div>
+        <div class="header-status">
+          <div class="status-chip"><span class="dot"></span><span>SYS :: ONLINE</span></div>
+          <div class="version-pill">v1.2</div>
+          <button type="button" id="teacherSetupBtn" onclick="openTeacherSetup()" style="background:rgba(255,255,255,.95);border:1px solid rgba(0,0,0,.12);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:800;color:#3b3b5c;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.14);">⚙️ 선생님 설정</button>
+        </div>
+      </div>
+
+      <div class="header-inner">
+        <div class="hero-brand">
+          <div class="hero-chest" aria-hidden="true">
+            <svg viewBox="0 0 220 170" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="bodyGold" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#FFC947"/>
+                  <stop offset="100%" stop-color="#E4981D"/>
+                </linearGradient>
+                <linearGradient id="woodBrown" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#C97528"/>
+                  <stop offset="100%" stop-color="#9C4F1E"/>
+                </linearGradient>
+              </defs>
+              <ellipse cx="110" cy="145" rx="72" ry="14" fill="rgba(92,130,210,.15)"/>
+              <path d="M56 56c0-23 24-39 54-39s54 16 54 39v14H56V56z" fill="url(#woodBrown)" stroke="#E7A617" stroke-width="8"/>
+              <rect x="44" y="64" width="132" height="74" rx="12" fill="url(#bodyGold)" stroke="#E7A617" stroke-width="8"/>
+              <rect x="61" y="76" width="98" height="50" rx="10" fill="#C77727" opacity=".92"/>
+              <rect x="102" y="24" width="16" height="114" rx="7" fill="#FFCF4F" stroke="#E7A617" stroke-width="6"/>
+              <rect x="50" y="76" width="120" height="14" rx="7" fill="#FFCF4F" opacity=".88"/>
+              <rect x="56" y="114" width="108" height="14" rx="7" fill="#FFCF4F" opacity=".88"/>
+              <rect x="92" y="82" width="36" height="54" rx="12" fill="#FFD765" stroke="#E7A617" stroke-width="5"/>
+              <circle cx="110" cy="104" r="9" fill="#9D601E"/>
+              <path d="M98 103h24" stroke="#FFE396" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="153" cy="45" r="6" fill="#FFE36B"/>
+              <circle cx="162" cy="33" r="4" fill="#FFCA4C"/>
+              <circle cx="173" cy="46" r="5" fill="#FFD75F"/>
+            </svg>
+          </div>
+
+          <div class="hero-center">
+            <div class="logo-title" aria-label="우리 반 앱 보물상자">
+              <span class="word-blue">우리</span>
+              <span class="word-blue2">반</span>
+              <span class="word-pink">앱</span>
+              <span class="word-yellow">보물상자</span>
+            </div>
+            <div class="hero-ribbon" id="className">불러오는 중...</div>
+            <div class="class-meta">
+              <div class="class-pill" id="motto">오늘도 즐겁게 배워요</div>
+            </div>
+          </div>
+
+          <div class="header-side-visual" aria-hidden="true">
+            <div class="happy-cloud"></div>
+            <div class="cloud-face">😊</div>
+            <div class="small-spark s1">✨</div>
+            <div class="small-spark s2">⭐</div>
+            <div class="small-spark s3">✦</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <div class="sidebar-panel">
+        <div class="sidebar-title">보물 지도</div>
+        <nav class="nav" id="nav" role="tablist"></nav>
+        <select class="nav-select" id="navSelect" aria-label="카테고리 선택"></select>
+        <div class="sidebar-helper">오늘의 선물 상자를<br>열어 봐요!<span>귀엽고 반짝이는 앱이 기다리고 있어요.</span></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="main-panel">
+        <div class="main-content">
+          <div class="main-header">
+            <div class="main-kicker">추천 보물</div>
+            <h2 class="main-title" id="categoryTitle">불러오는 중...</h2>
+            <div class="main-sub" id="categorySub"></div>
+          </div>
+          <div id="content">
+            <div class="state">
+              <div class="state-box">
+                <div class="spinner">🧭</div>
+                <div class="state-title">보물상자를 준비하는 중이에요</div>
+                <div class="state-text">구글 시트에서 반짝이는 앱 정보를 가져오고 있어요.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ⚙️ 선생님 설정 팝업 -->
+  <div id="teacherModal" onclick="if(event.target===this)closeTeacherSetup()" style="display:none;position:fixed;inset:0;z-index:2147483600;background:rgba(0,0,0,.45);align-items:center;justify-content:center;">
+    <div style="background:#fff;max-width:460px;width:92%;border-radius:18px;padding:22px;font-family:inherit;box-shadow:0 14px 50px rgba(0,0,0,.35);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <h3 style="margin:0;font-size:16px;font-weight:800;color:#3b3b5c;">⚙️ 선생님 설정</h3>
+        <button type="button" onclick="closeTeacherSetup()" aria-label="닫기" style="background:transparent;border:0;font-size:20px;line-height:1;cursor:pointer;color:#888;">✕</button>
+      </div>
+      <p style="margin:0 0 12px;font-size:12.5px;color:#777;line-height:1.5;">Google Apps Script 배포 주소(.../exec)를 입력하면 우리 반 앱 목록이 보여요.</p>
+      <input type="text" id="input-exec-url" placeholder="https://script.google.com/.../exec" style="width:100%;box-sizing:border-box;padding:11px;border:1px solid #d7d7e0;border-radius:10px;font-size:13px;margin-bottom:10px;">
+      <button type="button" onclick="saveExecUrl()" style="width:100%;padding:12px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:0;border-radius:10px;font-weight:800;cursor:pointer;font-size:14px;">🔗 연결하기</button>
+      <div id="student-link-area" style="display:none;margin-top:14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px;">
+        <p style="margin:0 0 6px;font-size:12px;color:#15803d;font-weight:800;">✅ 연결되었습니다!</p>
+        <p style="margin:0 0 6px;font-size:12px;color:#166534;">학생용 입장 주소:</p>
+        <input type="text" id="student-link-display" readonly style="width:100%;box-sizing:border-box;font-size:11.5px;padding:8px;border:1px solid #cbe7d2;border-radius:8px;margin-bottom:8px;background:#fff;">
+        <button type="button" onclick="copyStudentLink()" style="width:100%;padding:10px;background:#10b981;color:#fff;border:0;border-radius:8px;font-weight:800;cursor:pointer;font-size:12.5px;">📋 링크 복사</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mascot" id="mascot" role="button" aria-label="보물 친구" tabindex="0">🎁</div>
+
+  <script>
+    const CARD_STYLES = ['style-sun', 'style-mint', 'style-purple', 'style-pink'];
+    const NAV_EMOJIS = ['⭐', '📘', '🧮', '🎮', '🎨', '🎵', '🧪', '🧩', '🪄', '🏆'];
+    const CARD_DOODLES = ['♡', '✿', '🍀', '★'];
+    const TREASURE_SYMBOLS = ['💖', '🍬', '⭐', '✨', '🎀', '🌼', '🧸'];
+    const MASCOT_FRIENDS = ['🎁', '🧸', '🐰', '🐥', '🐱', '🦄', '🌈', '🍓'];
+    const TOAST_MESSAGES = ['🍬 반짝 보물 발견! 🍬', '🎀 정말 멋진 탐험이야! 🎀', '🌈 우와, 레벨 업! 🌈', '💖 깜찍 보상 획득! 💖', '🌟 오늘도 최고야! 🌟', '🧸 비밀 선물이 열렸어! 🧸'];
+
+    /* ───────── BYOB 연결 (GitHub Pages ↔ Apps Script) ───────── */
+    var EXEC_LS_KEY = 'classlauncher:execUrl';
+    function _readHashExec(){
+      try{ var m=(location.hash||'').match(/[#&]c=([^&]+)/); if(m) return decodeURIComponent(m[1]); }catch(e){}
+      return '';
+    }
+    function getExecUrl(){
+      var fromHash=_readHashExec();
+      if(fromHash){ try{ localStorage.setItem(EXEC_LS_KEY, fromHash); }catch(e){} return fromHash; }
+      try{ return localStorage.getItem(EXEC_LS_KEY) || ''; }catch(e){ return ''; }
+    }
+    var __cbSeq=0;
+    function callServer(action, data){
+      return new Promise(function(resolve, reject){
+        var exec=getExecUrl();
+        if(!exec){ // 체험(데모) 모드
+          if(action==='getClassInfo') return resolve(DEMO_CLASS_INFO);
+          if(action==='getAppData')   return resolve(DEMO_APP_DATA);
+          return resolve({ ok:false, demo:true });
+        }
+        var cbName='__lcb_'+(++__cbSeq)+'_'+Date.now();
+        var s=document.createElement('script');
+        var timer=setTimeout(function(){ cleanup(); reject(new Error('연결 시간이 초과됐어요.')); },12000);
+        function cleanup(){ try{ delete window[cbName]; }catch(e){ window[cbName]=undefined; } if(s&&s.parentNode) s.parentNode.removeChild(s); clearTimeout(timer); }
+        window[cbName]=function(res){ cleanup(); resolve(res); };
+        var url=exec+(exec.indexOf('?')>=0?'&':'?')+'callback='+encodeURIComponent(cbName)+'&action='+encodeURIComponent(action);
+        if(data){ url+='&data='+encodeURIComponent(JSON.stringify(data)); }
+        s.onerror=function(){ cleanup(); reject(new Error('연결에 실패했어요.')); };
+        s.src=url; document.head.appendChild(s);
+      });
+    }
+    /* 체험 모드 데모 데이터 (선생님 시트 미연결 시) */
+    var DEMO_CLASS_INFO={ className:'우리 반 앱 보물상자', motto:'오늘도 신나는 학습 탐험 출발!' };
+    function _di(o,n,e,l,gd,b){ return { order:o, name:n, emoji:e, link:l, guide:gd, guideHtml:gd, guideAlign:'', badge:b }; }
+    var DEMO_APP_DATA={
+      categories:['아침활동','자기주도학습','놀이활동'],
+      data:{
+        '아침활동':[ _di(1,'오늘의 명언','💬','https://example.com','오늘의 명언을 읽고 한 줄 소감을 적어보세요.','추천'), _di(2,'아침 독서','📚','https://example.com','15분간 책을 읽고 인상 깊은 부분을 메모해요.','') ],
+        '자기주도학습':[ _di(1,'수학 익힘','🧮','https://example.com','오늘 배운 단원의 문제를 풀어보세요.','NEW'), _di(2,'한자 카드','🀄','https://example.com','오늘의 한자 5개를 익혀봅니다.','') ],
+        '놀이활동':[ _di(1,'단어 만들기','🎲','https://example.com','주어진 자음과 모음으로 단어를 만들어요.','인기') ]
+      }
+    };
+
+    const state = { categories: [], data: {}, activeCategory: null };
+
+    const $nav = document.getElementById('nav');
+    const $navSelect = document.getElementById('navSelect');
+    const $content = document.getElementById('content');
+    const $catTitle = document.getElementById('categoryTitle');
+    const $catSub = document.getElementById('categorySub');
+    const $className = document.getElementById('className');
+    const $motto = document.getElementById('motto');
+    const $mascot = document.getElementById('mascot');
+
+    function loadLauncher() {
+      callServer('getClassInfo').then(function (info) {
+        info = info || {};
+        $className.textContent = info.className || '우리 반 앱 보물상자';
+        $motto.textContent = info.motto || '오늘도 신나는 학습 탐험 출발!';
+      }).catch(function () {
+        $className.textContent = '우리 반 앱 보물상자';
+        $motto.textContent = '오늘도 신나는 학습 탐험 출발!';
+      });
+      callServer('getAppData').then(function (payload) {
+        payload = payload || {};
+        state.categories = payload.categories || [];
+        state.data = payload.data || {};
+        if (!state.categories.length) { renderEmptyAll(); return; }
+        renderNav();
+        selectCategory(state.categories[0]);
+      }).catch(function (err) {
+        console.error('getAppData error:', err);
+        renderError(err && err.message ? err.message : '보물 정보를 불러오지 못했어요.');
+      });
+    }
+    function isStudentLink(){ return /[#&]c=/.test(location.hash || ''); }
+    function openTeacherSetup(){ var m=document.getElementById('teacherModal'); if(m) m.style.display='flex'; }
+    function closeTeacherSetup(){ var m=document.getElementById('teacherModal'); if(m) m.style.display='none'; }
+    function saveExecUrl(){
+      var el=document.getElementById('input-exec-url'); var url=(el && el.value || '').trim();
+      if(!url || url.indexOf('/exec')<0){ alert('올바른 배포 주소(.../exec)를 입력해 주세요.'); return; }
+      try{ localStorage.setItem(EXEC_LS_KEY, url); }catch(e){}
+      var appUrl=window.location.origin + window.location.pathname;
+      var studentLink=appUrl + '#c=' + encodeURIComponent(url);
+      var disp=document.getElementById('student-link-display'); if(disp) disp.value=studentLink;
+      var area=document.getElementById('student-link-area'); if(area) area.style.display='block';
+      loadLauncher();
+    }
+    function copyStudentLink(){
+      var disp=document.getElementById('student-link-display'); if(!disp) return;
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(disp.value); }
+      else { disp.select(); try{ document.execCommand('copy'); }catch(e){} }
+    }
+
+    window.addEventListener('DOMContentLoaded', function () {
+      if (isStudentLink()) { ['teacherModal','teacherSetupBtn'].forEach(function(id){ var el=document.getElementById(id); if(el) el.remove(); }); }
+      loadLauncher();
+
+      $mascot.addEventListener('click', function (e) {
+        treasureBurst($mascot, e, document.body);
+        if (Math.random() < 0.45) {
+          $mascot.textContent = MASCOT_FRIENDS[Math.floor(Math.random() * MASCOT_FRIENDS.length)];
+        }
+      });
+      $mascot.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          $mascot.click();
+        }
+      });
+    });
+
+    function renderNav() {
+      $nav.innerHTML = '';
+      $navSelect.innerHTML = '';
+
+      state.categories.forEach(function (cat, idx) {
+        const count = (state.data[cat] || []).length;
+        const emoji = NAV_EMOJIS[idx % NAV_EMOJIS.length];
+
+        const btn = document.createElement('button');
+        btn.className = 'nav-item';
+        btn.setAttribute('role', 'tab');
+        btn.dataset.category = cat;
+        btn.innerHTML =
+          '<span class="nav-emoji">' + emoji + '</span>' +
+          '<span class="nav-label">' + escapeHTML(cat) + '</span>' +
+          '<span class="nav-count">' + count + '</span>';
+        btn.addEventListener('click', function (e) { triggerCategoryBurst(btn, e, cat); selectCategory(cat); });
+        $nav.appendChild(btn);
+
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = emoji + '  ' + cat + '  (' + count + ')';
+        $navSelect.appendChild(opt);
+      });
+    }
+
+    $navSelect.addEventListener('change', function (e) {
+      selectCategory(e.target.value);
+    });
+
+    function triggerCategoryBurst(btn, evt, cat) {
+      if (!btn) return;
+      btn.classList.remove('bursting');
+      void btn.offsetWidth;
+      btn.classList.add('bursting');
+      setTimeout(function () { btn.classList.remove('bursting'); }, 680);
+      treasureBurst(btn, evt, document.body, { count: 30, spreadX: 300, minRise: 70, maxRise: 170 });
+      showTreasureToast('🎉 ' + cat + ' 보물이 팡! 열렸어요!');
+    }
+
+    function selectCategory(cat) {
+      state.activeCategory = cat;
+      Array.prototype.forEach.call($nav.children, function (el) {
+        el.classList.toggle('is-active', el.dataset.category === cat);
+      });
+      if ($navSelect.value !== cat) $navSelect.value = cat;
+
+      $catTitle.textContent = cat;
+      const items = state.data[cat] || [];
+      if (items.length === 0) {
+        $catSub.textContent = '아직 보물이 준비되지 않았어요.';
+      } else if (items.length === 1) {
+        $catSub.textContent = '보물 1개를 찾았어요! 바로 열어 볼까요?';
+      } else {
+        $catSub.textContent = '보물 ' + items.length + '개가 기다리고 있어요!';
+      }
+      renderCards(items);
+    }
+
+    function renderCards(items) {
+      if (!items || items.length === 0) {
+        $content.innerHTML =
+          '<div class="state">' +
+            '<div class="state-box">' +
+              '<div class="state-emoji">🪙</div>' +
+              '<div class="state-title">아직 등록된 보물이 없어요</div>' +
+              '<div class="state-text">선생님이 곧 새로운 앱 보물을 채워 주실 거예요!</div>' +
+            '</div>' +
+          '</div>';
+        return;
+      }
+
+      const grid = document.createElement('div');
+      grid.className = 'grid';
+
+      items.forEach(function (item, idx) {
+        const card = document.createElement('a');
+        card.className = 'card ' + CARD_STYLES[idx % CARD_STYLES.length];
+        card.href = item.link || '#';
+        card.target = '_blank';
+        card.rel = 'noopener noreferrer';
+
+        if (!item.link) {
+          card.addEventListener('click', function (e) { e.preventDefault(); });
+          card.style.cursor = 'not-allowed';
+          card.title = '아직 열 수 없는 보물이에요';
+        } else {
+          card.addEventListener('click', function (e) {
+            treasureBurst(card, e, card);
+            showTreasureToast();
+          });
+        }
+
+        card.innerHTML =
+          '<div class="card-top">' +
+            '<div class="card-emoji-box"><span class="card-emoji">' + escapeHTML(item.emoji || '🎁') + '</span></div>' +
+            (item.badge ? '<span class="card-badge">' + escapeHTML(item.badge) + '</span>' : '<span></span>') +
+          '</div>' +
+          '<div class="card-doodle">' + CARD_DOODLES[idx % CARD_DOODLES.length] + '</div>' +
+          '<div class="card-name">' + escapeHTML(item.name) + '</div>' +
+          renderGuide(item) +
+          '<div class="card-cta">' +
+            '<div class="cta-label">보물 열기</div>' +
+            '<div class="cta-arrow">→</div>' +
+          '</div>';
+
+        grid.appendChild(card);
+      });
+
+      $content.innerHTML = '';
+      $content.appendChild(grid);
+    }
+
+    function treasureBurst(targetEl, evt, hostEl, options) {
+      const opts = options || {};
+      const host = hostEl || targetEl;
+      const isFixedHost = host === document.body;
+      let cx, cy;
+      if (isFixedHost && evt) {
+        cx = evt.clientX;
+        cy = evt.clientY;
+      } else {
+        const rect = targetEl.getBoundingClientRect();
+        cx = (evt && evt.clientX) ? (evt.clientX - rect.left) : rect.width / 2;
+        cy = (evt && evt.clientY) ? (evt.clientY - rect.top) : rect.height / 2;
+      }
+
+      const count = opts.count || 18;
+      const spreadX = opts.spreadX || 240;
+      const minRise = opts.minRise || 50;
+      const maxRise = opts.maxRise || 160;
+
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('span');
+        p.className = 'treasure-particle';
+        p.textContent = TREASURE_SYMBOLS[Math.floor(Math.random() * TREASURE_SYMBOLS.length)];
+        p.style.position = isFixedHost ? 'fixed' : 'absolute';
+        p.style.left = cx + 'px';
+        p.style.top = cy + 'px';
+        p.style.fontSize = (16 + Math.random() * 16) + 'px';
+        p.style.setProperty('--dx', ((Math.random() - 0.5) * spreadX) + 'px');
+        p.style.setProperty('--dy', (-(minRise + Math.random() * (maxRise - minRise))) + 'px');
+        p.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+        p.style.setProperty('--dur', (0.8 + Math.random() * 0.6) + 's');
+        host.appendChild(p);
+        setTimeout(function () { p.remove(); }, 1700);
+      }
+    }
+
+    function showTreasureToast(message) {
+      const toast = document.createElement('div');
+      toast.className = 'treasure-toast';
+      toast.textContent = message || TOAST_MESSAGES[Math.floor(Math.random() * TOAST_MESSAGES.length)];
+      document.body.appendChild(toast);
+      setTimeout(function () { toast.remove(); }, 1600);
+    }
+
+    function renderEmptyAll() {
+      $catTitle.textContent = '전체 보물';
+      $catSub.textContent = '보물상자를 준비하고 있어요.';
+      $content.innerHTML =
+        '<div class="state">' +
+          '<div class="state-box">' +
+            '<div class="state-emoji">🧰</div>' +
+            '<div class="state-title">보물상자가 아직 비어 있어요</div>' +
+            '<div class="state-text">스프레드시트에 카테고리와 앱을 추가하면 여기에 예쁘게 나타나요!</div>' +
+          '</div>' +
+        '</div>';
+    }
+
+    function renderError(msg) {
+      $catTitle.textContent = '앗, 길을 잃었어요';
+      $catSub.textContent = '';
+      $content.innerHTML =
+        '<div class="state">' +
+          '<div class="state-box">' +
+            '<div class="state-emoji">🧭</div>' +
+            '<div class="state-title">보물 정보를 불러오지 못했어요</div>' +
+            '<div class="state-text">' + escapeHTML(msg) + '</div>' +
+          '</div>' +
+        '</div>';
+    }
+
+    function escapeHTML(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function renderGuide(item) {
+      const html = (item.guideHtml && item.guideHtml.length)
+        ? item.guideHtml
+        : (item.guide ? escapeHTML(item.guide).replace(/\n/g, '<br>') : '');
+      if (!html) return '';
+      const align = item.guideAlign;
+      const styleAttr = align ? ' style="text-align:' + align + '"' : '';
+      return '<div class="card-guide"' + styleAttr + '>' + html + '</div>';
+    }
+  </script>
+<script>
+/* 체험 모드 안내 배너 (전 앱 일관) */
+(function(){
+  function isDemo(){
+    try{
+      if(/[#&]c=/.test(location.hash||'')) return false;
+      for(var j=0;j<localStorage.length;j++){ var k=localStorage.key(j)||''; if(/exec|gasurl|serverurl|sheet_api|gas_exec|appserverurl|endpoint/i.test(k) && localStorage.getItem(k)) return false; }
+      return true;
+    }catch(e){ return true; }
+  }
+  function show(){
+    if(document.getElementById('__demoBar')) return;
+    if(!isDemo()) return;
+    var bar=document.createElement('div'); bar.id='__demoBar';
+    bar.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:2147483000;background:#1f2937;color:#fff;font-size:13px;line-height:1.45;padding:9px 38px calc(9px + env(safe-area-inset-bottom)) 14px;text-align:center;font-family:sans-serif;box-shadow:0 -2px 10px rgba(0,0,0,0.25);';
+    bar.innerHTML='체험 모드예요 · 활동 기록은 이 기기에만 저장돼요(이어하기 가능). 선생님이 구글 시트를 연결하면 시트에 저장됩니다.';
+    var x=document.createElement('button'); x.type='button'; x.setAttribute('aria-label','닫기'); x.textContent='\u2715';
+    x.style.cssText='position:absolute;right:8px;top:50%;transform:translateY(-50%);background:transparent;border:0;color:#fff;font-size:16px;line-height:1;cursor:pointer;padding:6px;';
+    x.onclick=function(){ try{ bar.remove(); }catch(e){ bar.style.display='none'; } };
+    bar.appendChild(x); document.body.appendChild(bar);
+  }
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', show); } else { show(); }
+})();
+</script>
+</body>
+</html>
